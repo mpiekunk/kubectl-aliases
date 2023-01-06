@@ -30,7 +30,7 @@ def main():
     # (alias, full, allow_when_oneof, incompatible_with)
     cmds = [('k', 'kubectl', None, None)]
 
-    globs = [('sys', '--namespace=kube-system', None, ['sys'])]
+    globs = []
 
     ops = [
         ('a', 'apply --recursive -f', None, None),
@@ -39,8 +39,6 @@ def main():
         ('ex', 'exec -i -t', None, None),
         ('lo', 'logs -f', None, None),
         ('lop', 'logs -f -p', None, None),
-        ('p', 'proxy', None, ['sys']),
-        ('pf', 'port-forward', None, ['sys']),
         ('g', 'get', None, None),
         ('d', 'describe', None, None),
         ('rm', 'delete', None, None),
@@ -57,25 +55,33 @@ def main():
         ('sec', 'secret', ['g', 'd', 'rm'], None),
         ('no', 'nodes', ['g', 'd'], ['sys']),
         ('ns', 'namespaces', ['g', 'd', 'rm'], ['sys']),
+        ('ds', 'daemonsets', ['g', 'd', 'rm'], None),
+        ('pv', 'persistentvolumes', ['g', 'd', 'rm'], None),
+        ('pvc', 'persistentvolumeclaims', ['g', 'd', 'rm'], None),
+        ('j', 'jobs', ['g', 'd', 'rm'], None),
+        ('cj', 'cronjobs', ['g', 'd', 'rm'], None),
+        ('hpa', 'horizontalpodautoscalers', ['g', 'd', 'rm'], None),
+        ('crl', 'roles', ['g', 'd', 'rm'], None),
+        ('crb', 'rolebindings', ['g', 'd', 'rm'], None),
+        ('rl', 'roles', ['g', 'd', 'rm'], None),
+        ('rb', 'rolebindings', ['g', 'd', 'rm'], None),
+        ('sa', 'serviceaccounts', ['g', 'd', 'rm'], None),
         ]
     res_types = [r[0] for r in res]
 
     args = [
-        ('oyaml', '-o=yaml', ['g'], ['owide', 'ojson', 'sl']),
-        ('owide', '-o=wide', ['g'], ['oyaml', 'ojson']),
-        ('ojson', '-o=json', ['g'], ['owide', 'oyaml', 'sl']),
+        ('oyaml', '-o=yaml', ['g'], ['owide', 'ojson', 'sl', 'w']),
+        ('owide', '-o=wide', ['g'], ['oyaml', 'ojson', 'sl', 'w']),
+        ('ojson', '-o=json', ['g'], ['owide', 'oyaml', 'sl', 'w']),
         ('all', '--all-namespaces', ['g', 'd'], ['rm', 'f', 'no', 'sys']),
-        ('sl', '--show-labels', ['g'], ['oyaml', 'ojson'], None),
-        ('all', '--all', ['rm'], None), # caution: reusing the alias
-        ('w', '--watch', ['g'], ['oyaml', 'ojson', 'owide']),
+        ('w', '--watch', ['g'], ['oyaml', 'ojson', 'owide', 'crl', 'crb', 'rl', 'rb','sa']),
         ]
 
     # these accept a value, so they need to be at the end and
     # mutually exclusive within each other.
     positional_args = [('f', '--recursive -f', ['g', 'd', 'rm'], res_types + ['all'
-                       , 'l', 'sys']), ('l', '-l', ['g', 'd', 'rm'], ['f',
-                       'all']), ('n', '--namespace', ['g', 'd', 'rm',
-                       'lo', 'ex', 'pf'], ['ns', 'no', 'sys', 'all'])]
+                       , 'l', 'sys']), ('n', '--namespace', ['g', 'd', 'rm',
+                       'lo', 'lop', 'ex', 'pf'], ['ns', 'no', 'sys', 'all'])]
 
     # [(part, optional, take_exactly_one)]
     parts = [
